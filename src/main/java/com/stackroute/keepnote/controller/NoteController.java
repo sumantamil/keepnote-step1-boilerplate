@@ -1,10 +1,22 @@
 package com.stackroute.keepnote.controller;
 
+import java.util.List;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.stackroute.keepnote.model.Note;
+import com.stackroute.keepnote.repository.NoteRepository;
+
+
 
 /*Annotate the class with @Controller annotation. @Controller annotation is used to mark 
  * any POJO class as a controller so that Spring can recognize this class as a Controller
  * */
-
+@Controller
 public class NoteController {
 	/*
 	 * From the problem statement, we can understand that the application
@@ -17,6 +29,31 @@ public class NoteController {
 	 * 4. Update an existing note.
 	 */
 	
+	@RequestMapping("/note")
+	public String homePage() {
+		
+		return "index";
+	}
+	@RequestMapping("/insert")
+	public String insertPage() {
+		
+		return "insert1";
+	}
+	
+	@RequestMapping("/getAllNotes")
+	public String getAllNotes(ModelMap m) {
+		List<Note> ls;
+
+		try {
+			NoteRepository ob = new NoteRepository();
+			ls = ob.getList();
+			m.addAttribute("a1", ls);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return "display";
+
+	}
 	/* 
 	 * Get the application context from resources/beans.xml file using ClassPathXmlApplicationContext() class.
 	 * Retrieve the Note object from the context.
@@ -28,7 +65,17 @@ public class NoteController {
 	 * of the NoteRepository class and add it to the ModelMap which is an implementation of Map 
 	 * for use when building model data for use with views. it should map to the default URL i.e. "/" */
 	
-	
+	@RequestMapping(value="/saveNote",method = RequestMethod.POST)
+	public String insert(@ModelAttribute ("note")Note note) throws Exception {
+		NoteRepository ob=new NoteRepository();
+		try {
+			ob.addNote(note);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		return "display";
+	}
 	/*Define a handler method which will read the Note data from request parameters and
 	 * save the note by calling the addNote() method of NoteRepository class. Please note 
 	 * that the createdAt field should always be auto populated with system time and should not be accepted 
